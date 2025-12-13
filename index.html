@@ -2,12 +2,204 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3d-space-ui</title>
+
+    <!-- Primary Meta Tags -->
+    <title>3D Space Observatory - Interactive Space Visualization</title>
+    <meta name="title" content="3D Space Observatory - Interactive Space Visualization" />
+    <meta name="description" content="Explore the cosmos in stunning 3D. Interactive space visualization featuring planets, stars, and celestial bodies in an immersive web experience." />
+    <meta name="keywords" content="3D space, space visualization, astronomy, interactive space, 3D planets, WebGL, space observatory" />
+    <meta name="author" content="Space Observatory" />
+    <meta name="theme-color" content="#0a0a1f" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yoursite.com/" />
+    <meta property="og:title" content="3D Space Observatory - Interactive Space Visualization" />
+    <meta property="og:description" content="Explore the cosmos in stunning 3D. Interactive space visualization featuring planets, stars, and celestial bodies." />
+    <meta property="og:image" content="/space-observatory-svgrepo-com.svg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://yoursite.com/" />
+    <meta property="twitter:title" content="3D Space Observatory - Interactive Space Visualization" />
+    <meta property="twitter:description" content="Explore the cosmos in stunning 3D. Interactive space visualization featuring planets, stars, and celestial bodies." />
+    <meta property="twitter:image" content="/space-observatory-svgrepo-com.svg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/space-observatory-svgrepo-com.svg" />
+    <link rel="apple-touch-icon" href="/space-observatory-svgrepo-com.svg" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="/src/main.jsx" />
+
+    <style>
+      /* Critical CSS - Space Theme */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: linear-gradient(135deg, #0a0a1f 0%, #1a0a2e 50%, #16213e 100%);
+        color: #ffffff;
+      }
+
+      #root {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Loading Screen */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0a0a1f 0%, #1a0a2e 50%, #16213e 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
+
+      #loading-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Animated Stars Background */
+      .stars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        animation: twinkle 3s infinite;
+      }
+
+      @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+
+      /* Loading Spinner */
+      .spinner-container {
+        position: relative;
+        z-index: 1;
+      }
+
+      .spinner {
+        width: 80px;
+        height: 80px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top: 4px solid #ffffff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .loading-text {
+        margin-top: 24px;
+        font-size: 18px;
+        font-weight: 300;
+        letter-spacing: 2px;
+        color: rgba(255, 255, 255, 0.8);
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+
+      /* Observatory Icon */
+      .observatory-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 32px;
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+    </style>
   </head>
   <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="stars" id="stars-container"></div>
+      <img src="/space-observatory-svgrepo-com.svg" alt="Space Observatory" class="observatory-icon" />
+      <div class="spinner-container">
+        <div class="spinner"></div>
+      </div>
+      <div class="loading-text">INITIALIZING OBSERVATORY</div>
+    </div>
+
+    <!-- React Root -->
     <div id="root"></div>
+
+    <!-- Generate stars -->
+    <script>
+      // Create animated stars
+      const starsContainer = document.getElementById('stars-container');
+      for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        starsContainer.appendChild(star);
+      }
+
+      // Hide loading screen when app is ready
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loading-screen');
+          loadingScreen.classList.add('hidden');
+          setTimeout(() => {
+            loadingScreen.remove();
+          }, 500);
+        }, 500);
+      });
+    </script>
+
+    <!-- Main Application -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

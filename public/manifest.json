@@ -1,0 +1,20 @@
+{
+  "name": "3D Space Observatory",
+  "short_name": "Space Observatory",
+  "description": "Interactive 3D space visualization featuring planets, stars, and celestial bodies",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a1f",
+  "theme_color": "#0a0a1f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/space-observatory-svgrepo-com.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "entertainment"],
+  "screenshots": []
+}
