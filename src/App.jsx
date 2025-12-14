@@ -1,6 +1,10 @@
+import { useState } from "react";
 import ThreeScene from "./components/ThreeScene";
+import SpeedController from "./components/SpeedController";
 
 export default function App() {
+  const [orbitalSpeed, setOrbitalSpeed] = useState(1);
+
   return (
     <div className="h-screen w-screen bg-gray-900 text-white">
       <div className="flex h-full">
@@ -14,9 +18,12 @@ export default function App() {
 
         {/* 3D Canvas */}
         <div className="flex-1">
-          <ThreeScene />
+          <ThreeScene orbitalSpeed={orbitalSpeed} />
         </div>
       </div>
+
+      {/* Speed Controller UI */}
+      <SpeedController onSpeedChange={setOrbitalSpeed} />
     </div>
   );
 }
