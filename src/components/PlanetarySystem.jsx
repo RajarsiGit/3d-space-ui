@@ -32,17 +32,23 @@ export default function PlanetarySystem({
       const orbitOffset = Math.random() * Math.PI * 2; // Random starting position
       const y = (Math.random() - 0.5) * 0.5; // Minimal vertical variation
 
-      // Planet type based on distance (inner rocky, middle/outer gas/ice)
-      let typeIndex;
-      if (i < planetCount * 0.4) typeIndex = 0; // Inner planets rocky
-      else if (i < planetCount * 0.7) typeIndex = 1; // Middle planets gas giants
-      else typeIndex = 2; // Outer planets ice
-
-      const type = planetTypes[typeIndex];
+      // Special case: Make the 3rd planet Earth (habitable zone)
+      let type;
+      if (i === 2) {
+        type = "earth";
+      } else {
+        // Planet type based on distance (inner rocky, middle/outer gas/ice)
+        let typeIndex;
+        if (i < planetCount * 0.4) typeIndex = 0; // Inner planets rocky
+        else if (i < planetCount * 0.7) typeIndex = 1; // Middle planets gas giants
+        else typeIndex = 2; // Outer planets ice
+        type = planetTypes[typeIndex];
+      }
 
       // Size varies by type - much smaller relative to sun
       let size;
-      if (type === "rocky") size = 0.3 + Math.random() * 0.4; // 0.3-0.7 (small)
+      if (type === "earth") size = 0.6; // Earth-sized
+      else if (type === "rocky") size = 0.3 + Math.random() * 0.4; // 0.3-0.7 (small)
       else if (type === "gas")
         size = 0.8 + Math.random() * 0.6; // 0.8-1.4 (larger)
       else size = 0.5 + Math.random() * 0.5; // 0.5-1.0 (medium)
@@ -58,9 +64,15 @@ export default function PlanetarySystem({
 
       // Generate moons (more likely for larger planets, fewer overall)
       const moons = [];
-      const moonChance = type === "gas" ? 0.7 : 0.3; // Gas giants more likely to have moons
-      const moonCount =
-        Math.random() < moonChance ? Math.floor(Math.random() * 2) + 1 : 0;
+      let moonCount;
+
+      if (type === "earth") {
+        // Earth always gets one moon
+        moonCount = 1;
+      } else {
+        const moonChance = type === "gas" ? 0.7 : 0.3; // Gas giants more likely to have moons
+        moonCount = Math.random() < moonChance ? Math.floor(Math.random() * 2) + 1 : 0;
+      }
 
       for (let j = 0; j < moonCount; j++) {
         const moonSize = size * (0.1 + Math.random() * 0.15); // Scale with planet

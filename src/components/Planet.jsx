@@ -46,6 +46,16 @@ export default function Planet({
       roughness: 0.9,
       metalness: 0.1,
     },
+    earth: {
+      // Earth with deep blue oceans and green/brown landmasses
+      colors: ["#1E90FF"], // Deep ocean blue base
+      atmosphereColors: ["#87CEEB"], // Sky blue atmosphere
+      roughness: 0.7,
+      metalness: 0.2,
+      hasLandmasses: true,
+      landColor: "#228B22", // Forest green
+      landColor2: "#8B4513", // Saddle brown
+    },
     gas: {
       // Gas giant colors (Jupiter oranges/browns, Saturn yellows)
       colors: [
@@ -108,17 +118,63 @@ export default function Planet({
     }
   });
 
+  // Create landmass geometry for Earth
+  const landmassGeometry = useMemo(() => {
+    if (type !== "earth") return null;
+
+    const geometry = new THREE.SphereGeometry(size * 1.001, 64, 64);
+    const colors = [];
+    const positions = geometry.attributes.position;
+
+    // Create a pseudo-random landmass pattern based on vertex positions
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i);
+      const y = positions.getY(i);
+      const z = positions.getZ(i);
+
+      // Pseudo-random noise based on position
+      const noise1 = Math.sin(x * 5 + y * 3) * Math.cos(z * 4);
+      const noise2 = Math.sin(x * 3 - z * 5) * Math.cos(y * 2);
+      const noise3 = Math.sin(y * 4 + z * 3) * Math.cos(x * 6);
+      const combinedNoise = (noise1 + noise2 + noise3) / 3;
+
+      // Create landmass pattern (roughly 30% land, 70% ocean)
+      const isLand = combinedNoise > 0.2;
+
+      if (isLand) {
+        // Mix of green and brown for land
+        const landType = Math.sin(x * 10) > 0 ? 0 : 1;
+        if (landType === 0) {
+          colors.push(0.13, 0.55, 0.13); // Green (forest)
+        } else {
+          colors.push(0.55, 0.27, 0.07); // Brown (desert/mountain)
+        }
+      } else {
+        // Ocean blue
+        colors.push(0.12, 0.56, 1.0); // Deep ocean blue
+      }
+    }
+
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    return geometry;
+  }, [type, size]);
+
   return (
     <group ref={groupRef} position={position}>
       {/* Main Planet Sphere */}
       <mesh ref={planetRef}>
-        <sphereGeometry args={[size, 64, 64]} />
+        {type === "earth" && landmassGeometry ? (
+          <primitive object={landmassGeometry} attach="geometry" />
+        ) : (
+          <sphereGeometry args={[size, 64, 64]} />
+        )}
         <meshStandardMaterial
-          color={baseColor}
+          color={type === "earth" ? "#FFFFFF" : baseColor}
           roughness={planetConfig.roughness}
           metalness={planetConfig.metalness}
-          emissive={baseColor}
-          emissiveIntensity={0.05}
+          emissive={type === "earth" ? new THREE.Color("#1E90FF") : baseColor}
+          emissiveIntensity={type === "earth" ? 0.15 : 0.05}
+          vertexColors={type === "earth"}
         />
       </mesh>
 
@@ -128,7 +184,7 @@ export default function Planet({
         <meshBasicMaterial
           color={atmosphereColor}
           transparent
-          opacity={0.2}
+          opacity={type === "earth" ? 0.3 : 0.2}
           side={THREE.BackSide}
         />
       </mesh>
